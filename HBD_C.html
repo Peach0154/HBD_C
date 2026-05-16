@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday!</title>
+    <!-- นำเข้าฟอนต์ใหม่: Anuphan (ไทย) และ Alex Brush (อังกฤษตัวเขียนหรู) -->
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600&family=Alex+Brush&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ฉากหลังสุดหรู Space & Aurora */
+        body {
+            background-color: #0b071a;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(106, 17, 203, 0.22) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(37, 117, 252, 0.18) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 120, 150, 0.06) 0%, transparent 60%);
+            background-attachment: fixed;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Anuphan', sans-serif; /* เปลี่ยนฟอนต์หลักเป็น Anuphan */
+            color: #fff;
+            padding: 15px;
+            position: relative;
+        }
+
+        /* โครงสร้างเลเยอร์ดวงดาว */
+        .star-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+            opacity: 0;
+        }
+
+        /* กลุ่มดวงดาว 24 ดวง */
+        .g1 { animation: twinkleStar 4s infinite ease-in-out; }
+        .s1 { top: 12%; left: 10%; width: 14px; height: 14px; animation-delay: 0s; }
+        .s2 { top: 25%; left: 88%; width: 16px; height: 16px; animation-delay: 1s; background: #ffeaa7; }
+        .s3 { top: 72%; left: 14%; width: 15px; height: 15px; animation-delay: 2s; }
+        .s4 { top: 82%; left: 78%; width: 12px; height: 12px; animation-delay: 3s; }
+        .s5 { top: 38%; left: 7%; width: 11px; height: 11px; animation-delay: 1.5s; }
+        .s6 { top: 8%; left: 68%; width: 15px; height: 15px; animation-delay: 2.5s; }
+
+        .g2 { animation: twinkleStar 3s infinite ease-in-out; }
+        .s7 { top: 58%; left: 90%; width: 13px; height: 13px; animation-delay: 0.2s; }
+        .s8 { top: 88%; left: 35%; width: 10px; height: 10px; animation-delay: 0.8s; }
+        .s9 { top: 18%; left: 45%; width: 12px; height: 12px; animation-delay: 1.4s; background: #fab1a0; }
+        .s10 { top: 48%; left: 83%; width: 14px; height: 14px; animation-delay: 2s; }
+        .s11 { top: 64%; left: 5%; width: 11px; height: 11px; animation-delay: 0.5s; }
+        .s12 { top: 28%; left: 24%; width: 13px; height: 13px; animation-delay: 1.7s; }
+
+        .g3 { animation: twinkleStar 5s infinite ease-in-out; }
+        .s13 { top: 5%; left: 28%; width: 15px; height: 15px; animation-delay: 0.5s; }
+        .s14 { top: 92%; left: 18%; width: 12px; height: 12px; animation-delay: 1.5s; }
+        .s15 { top: 40%; left: 93%; width: 16px; height: 16px; animation-delay: 2.5s; background: #ffeaa7; }
+        .s16 { top: 84%; left: 55%; width: 13px; height: 13px; animation-delay: 3.5s; }
+        .s17 { top: 22%; left: 72%; width: 10px; height: 10px; animation-delay: 1.2s; }
+        .s18 { top: 52%; left: 16%; width: 14px; height: 14px; animation-delay: 4.2s; }
+
+        .g4 { animation: twinkleStar 2.5s infinite ease-in-out; }
+        .s19 { top: 15%; left: 80%; width: 9px; height: 9px; animation-delay: 0.3s; }
+        .s20 { top: 78%; left: 92%; width: 8px; height: 8px; animation-delay: 0.9s; }
+        .s21 { top: 32%; left: 3%; width: 9px; height: 9px; animation-delay: 1.2s; }
+        .s22 { top: 95%; left: 70%; width: 9px; height: 9px; animation-delay: 0.1s; }
+        .s23 { top: 3%; left: 88%; width: 10px; height: 10px; animation-delay: 1.8s; }
+        .s24 { top: 62%; left: 28%; width: 8px; height: 8px; animation-delay: 0.6s; }
+
+        @keyframes twinkleStar {
+            0%, 100% { transform: scale(0.2); opacity: 0.05; filter: drop-shadow(0 0 2px rgba(255,255,255,0)); }
+            50% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
+        }
+
+        /* --- โซนกล่องของขวัญ (หน้าแรก) --- */
+        .gift-container {
+            text-align: center;
+            transition: all 0.8s ease;
+            cursor: pointer;
+            width: 100%;
+            max-width: 500px;
+            z-index: 5;
+        }
+
+        .gift-container h2 {
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            animation: bounce 2s infinite;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+            line-height: 1.5;
+        }
+
+        .gift-box {
+            font-size: 80px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+            animation: wobble 1.5s infinite ease-in-out;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+        }
+
+        /* --- โซนการ์ดอวยพร --- */
+        .card-container {
+            width: 100%;
+            max-width: 360px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 28px 24px 24px;
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.15);
+            opacity: 0;
+            transform: scale(0.8) translateY(30px);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute;
+            z-index: 3;
+        }
+
+        .card-container.reveal {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .profile-wrap {
+            position: relative;
+            width: 135px; 
+            height: 135px;
+            margin: 0 auto 8px;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        }
+
+        /* ปรับสไตล์หัวข้อภาษาอังกฤษให้เป็นตัวเขียนหรูหรา และอยู่บรรทัดเดียวกันเสมอ */
+        .card-container h1 {
+            font-family: 'Alex Brush', cursive;
+            font-size: 2.5rem; /* ลดขนาดลงเพื่อให้แสดงผลในบรรทัดเดียวได้สวยงาม */
+            font-weight: 400;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: -2px; 
+            letter-spacing: 1px;
+            white-space: nowrap; /* ป้องกันการตัดบรรทัด */
+        }
+
+        .birthday-name {
+            font-size: 1.05rem;
+            color: #ff7597;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .wishes-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 18px;
+            padding: 18px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .wish-line {
+            display: block;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e5e5e5;
+            font-weight: 300;
+            margin-bottom: 8px;
+            word-break: keep-all;
+        }
+
+        .wish-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight-gold {
+            color: #ffd700;
+            font-weight: 500;
+            text-shadow: 0 0 8px rgba(255,215,0,0.2);
+        }
+
+        .sender-name {
+            display: block;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 14px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 10px;
+        }
+
+        /* ปุ่มฉลอง */
+        .glow-button {
+            margin-top: 18px;
+            padding: 10px 26px;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-family: 'Anuphan', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.35);
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .glow-button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(255, 75, 43, 0.5);
+        }
+
+        .glow-button:disabled {
+            background: linear-gradient(45deg, #555, #777);
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        /* --- ลูกโป่งสีแดง --- */
+        .balloon {
+            position: absolute;
+            width: 42px;
+            height: 52px;
+            background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            z-index: 1;
+            bottom: -100px;
+            opacity: 0.85;
+            animation: flyUp 7s linear forwards;
+        }
+
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 18px;
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-bottom: 5px solid #cc0000;
+        }
+
+        .balloon-string {
+            position: absolute;
+            bottom: -29px;
+            left: 21px;
+            width: 2px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes flyUp {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.9; }
+            50% { transform: translateY(-50vh) translateX(15px) rotate(3deg); }
+            100% { transform: translateY(-110vh) translateX(-10px) rotate(-3deg); opacity: 0; }
+        }
+
+        /* Responsive มือถือ */
+        @media (max-width: 480px) {
+            .gift-container h2 { font-size: 1.2rem; }
+            .gift-box { font-size: 70px; }
+            .card-container { padding: 24px 18px 18px; max-width: 320px; }
+            .profile-wrap { width: 110px; height: 110px; margin-bottom: 6px; }
+            .card-container h1 { font-size: 2.2rem; } /* ปรับขนาดบนมือถือให้พอดีแถวเดียว */
+            .birthday-name { font-size: 0.95rem; }
+            .wish-line { font-size: 0.88rem; line-height: 1.5; }
+            .wishes-box { padding: 14px 12px; }
+            .sender-name { font-size: 0.8rem; }
+            .glow-button { margin-top: 14px; padding: 9px 22px; font-size: 0.88rem; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-4deg); }
+            75% { transform: rotate(4deg); }
+        }
+
+        .hide {
+            opacity: 0 !important;
+            transform: scale(0.5) !important;
+            pointer-events: none;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2 !important; 
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- เลเยอร์ดวงดาวสี่แฉก 24 ดวง -->
+    <div class="star-bg">
+        <!-- กลุ่มที่ 1 -->
+        <div class="star g1 s1"></div>
+        <div class="star g1 s2"></div>
+        <div class="star g1 s3"></div>
+        <div class="star g1 s4"></div>
+        <div class="star g1 s5"></div>
+        <div class="star g1 s6"></div>
+        
+        <!-- กลุ่มที่ 2 -->
+        <div class="star g2 s7"></div>
+        <div class="star g2 s8"></div>
+        <div class="star g2 s9"></div>
+        <div class="star g2 s10"></div>
+        <div class="star g2 s11"></div>
+        <div class="star g2 s12"></div>
+        
+        <!-- กลุ่มที่ 3 -->
+        <div class="star g3 s13"></div>
+        <div class="star g3 s14"></div>
+        <div class="star g3 s15"></div>
+        <div class="star g3 s16"></div>
+        <div class="star g3 s17"></div>
+        <div class="star g3 s18"></div>
+        
+        <!-- กลุ่มที่ 4 -->
+        <div class="star g4 s19"></div>
+        <div class="star g4 s20"></div>
+        <div class="star g4 s21"></div>
+        <div class="star g4 s22"></div>
+        <div class="star g4 s23"></div>
+        <div class="star g4 s24"></div>
+    </div>
+
+    <!-- หน้าแรก: กล่องของขวัญ -->
+    <div class="gift-container" id="giftSection" onclick="openGift()">
+        <h2>มีของขวัญมาส่งให้...<br>ลองกดเปิดดูสิ!</h2>
+        <div class="gift-box">🎁</div>
+    </div>
+
+    <!-- หน้าสอง: การ์ดอวยพร -->
+    <div class="card-container" id="cardSection">
+        <div class="profile-wrap">
+            <img src="https://scontent.fbkk12-1.fna.fbcdn.net/v/t39.30808-6/474704954_3842952992613729_1548727113638658411_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=F_zxVzpgR0cQ7kNvwEow327&_nc_oc=AdqzfCGTwxQF4Rk-rXrqAPo84MYyO2sAIqA4sT9kRxORGr4Ax9T9zG1RLet-Fv1nYW8&_nc_zt=23&_nc_ht=scontent.fbkk12-1.fna&_nc_gid=Fv6Utd0rizQ6A6sampyiIQ&_nc_ss=7b289&oh=00_Af4RbuRQXpT4qNlQEGmtm6HZElih-yfOHx815OBpSvCyMA&oe=6A0DAF80" alt="Birthday" class="profile-img">
+        </div>
+        <h1>Happy Birthday</h1>
+        <div class="birthday-name">To You ♡</div>
+        
+        <div class="wishes-box">
+            <div class="wish-line">ขอให้มีความสุขมากๆ ในทุกๆ วัน</div>
+            <div class="wish-line">ขอให้ปีนี้เป็นปีที่ดีและ<span class="highlight-gold">ประสบความสำเร็จ</span></div>
+            <div class="wish-line">การงานราบรื่นและ<span class="highlight-gold">เงินทองไหลมาเทมา</span></div>
+            <div class="wish-line">มีสุขภาพร่างกายแข็งแรง สมปรารถนานะ!</div>
+            
+            <div class="sender-name">จาก: [Ying & Athen]</div>
+        </div>
+
+        <button class="glow-button" id="celebrateBtn" onclick="handleCelebrateClick()">ฉลอง!</button>
+    </div>
+
+    <script>
+        let isCooldown = false;
+
+        function openGift() {
+            document.getElementById('giftSection').classList.add('hide');
+            setTimeout(() => {
+                document.getElementById('cardSection').classList.add('reveal');
+                runSideConfetti(); 
+                createBalloons();   
+            }, 600);
+        }
+
+        function handleCelebrateClick() {
+            if (isCooldown) return;
+
+            const btn = document.getElementById('celebrateBtn');
+            isCooldown = true;
+            btn.disabled = true;
+            btn.innerText = "กำลังจุดพลุ...✨";
+
+            celebrateFireworkStyle();
+
+            setTimeout(() => {
+                isCooldown = false;
+                btn.disabled = false;
+                btn.innerText = "ฉลอง!";
+            }, 2000);
+        }
+
+        function createBalloons() {
+            const balloonCount = 14; 
+            for (let i = 0; i < balloonCount; i++) {
+                setTimeout(() => {
+                    const balloon = document.createElement('div');
+                    balloon.classList.add('balloon');
+                    
+                    const string = document.createElement('div');
+                    string.classList.add('balloon-string');
+                    balloon.appendChild(string);
+                    
+                    const randomX = Math.random() * 100; 
+                    balloon.style.left = randomX + 'vw';
+                    
+                    const scale = 0.6 + Math.random() * 0.4;
+                    balloon.style.transform = `scale(${scale})`;
+                    
+                    document.body.appendChild(balloon);
+                    
+                    setTimeout(() => { balloon.remove(); }, 7000); 
+                }, i * 260); 
+            }
+        }
+
+        function runSideConfetti() {
+            var duration = 1.2 * 1000; 
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 40,
+                    origin: { x: 0, y: 0.8 }, 
+                    colors: ['#ffd700', '#ff416c', '#ff4b2b', '#00f2fe', '#a8ff78']
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 40,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#ffd700', '#ff416c', '#ff4b2b', '#00f2fe', '#a8ff78']
+                });
+
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        }
+
+        function celebrateFireworkStyle() {
+            createBalloons();
+
+            var duration = 1.8 * 1000; 
+            var animationEnd = Date.now() + duration;
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) { return clearInterval(interval); }
+
+                confetti({
+                    particleCount: 50,         
+                    spread: 75,               
+                    startVelocity: 35,         
+                    gravity: 0.8,              
+                    scalar: 1.1,               
+                    drift: randomInRange(-0.5, 0.5), 
+                    origin: { x: randomInRange(0.15, 0.35), y: randomInRange(0.25, 0.45) },
+                    colors: ['#ff0055', '#00ffcc', '#ffcc00', '#ffffff', '#ff00ff']
+                });
+
+                confetti({
+                    particleCount: 50,
+                    spread: 75,
+                    startVelocity: 35,
+                    gravity: 0.8,
+                    scalar: 1.1,
+                    drift: randomInRange(-0.5, 0.5),
+                    origin: { x: randomInRange(0.65, 0.85), y: randomInRange(0.25, 0.45) },
+                    colors: ['#0022ff', '#00ff33', '#ff5500', '#ffff00', '#ffffff']
+                });
+            }, 350); 
+        }
+    </script>
+</body>
+</html>
